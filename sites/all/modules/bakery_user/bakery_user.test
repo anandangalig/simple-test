@@ -19,6 +19,9 @@ class BakeryUserTests extends DrupalWebTestCase {
 
     public function setUp() {
         parent::setUp(array('bakery_user')); //this enables the created module
+        $user = $this->drupalCreateAdminUser();//these 3 added later, and is partly arranging the environment for the testPageTest()
+        $this->drupalLogin($user);
+        $this->createTestingPage();
     }
 
     public function testLoginWelcome() {
@@ -27,6 +30,14 @@ class BakeryUserTests extends DrupalWebTestCase {
         $this->assertText("Welcome to Cameron's Bakery!", 'The user was successfully redirected. Woot!');
     }
 
+    public function testPageTest() {
+      $this->drupalGet('node/1'); //alias can work too
+      $this->assertText('1, 2, 3!', 'The text on the page is correct.');
+    }
+
+
+// ============below functions can co-exist since they are creating separate environments that are used for different test functions. 
+
     public function drupalCreateAuthenticatedUser(array $permissions = array()) {
         $roles = user_roles(); //grabs all user roles
         $index = array_search('authenticated', $roles);//finds the index of suer role - authenticated
@@ -34,6 +45,27 @@ class BakeryUserTests extends DrupalWebTestCase {
         $user->roles[$index] = 'authenticated'; //this sets the role of created user to authenticated
         return user_save($user); //saves the user and retruns it
     }
+    public function drupalCreateAdminUser(array $permissions = array()) {
+        $roles = user_roles();
+        $index = array_search('administrator', $roles);
+        $user = $this->drupalCreateUser($permissions);
+        $user->roles[$index] = 'administrator';
+        return user_save($user);
+    }
+    public function createTestingPage() {
+        //$info = the information needed to create the basic page at the url `pagetest`.
+        $info = array();
+        $info['title'] = "Testing!";
+        $info["body[und][0][value]"] = "1, 2, 3!";
 
-    
+        //save the new page
+        $this->drupalPost('node/add/page', $info, t('Save'));
+
+        //set new page to the correct path. We know this will be node/1 because we are starting from scratch.
+        $path['source'] = 'node/1';
+        $path['alias'] = 'pagetest';
+        path_save($path);
+    }
+
+
 }
