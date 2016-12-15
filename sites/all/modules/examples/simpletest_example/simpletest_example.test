@@ -167,7 +167,7 @@ class SimpleTestUnitTestExampleTestCase extends DrupalUnitTestCase {
   /**
    * Test simpletest_example_empty_mysql_date().
    *
-   * Note that no environment is provided; we're just testing the correct
+   * Note that no environment is provided, such as loggin in; we're just testing the correct
    * behavior of a function when passed specific arguments.
    */
   public function testSimpleTestUnitTestExampleFunction() {
