@@ -1,0 +1,7 @@
+name  = Clock Angle
+description = Calculates the distance between the minute and hour hands on an analog clock.
+package = Epicodus Examples
+core = 7.x
+files[] = clock_angle.module
+files[] = clock_angle.test
+dependencies[] = simpletest

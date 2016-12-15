@@ -1,0 +1,37 @@
+<?php
+  class ClockAngleTestCase extends DrupalUnitTestCase
+  {
+    public static function getInfo()
+    {
+      return array(
+        'name' => 'Clock Angle Unit Test',
+        'description' => 'Tests calculate_clock_angle function of the Clock Angle module.',
+        'group' => 'Epicodus Examples Tests',
+      );
+    }
+
+     public function testCalculateClockAngle()
+     {
+       //ARRANGE:
+       $results_message = 'It works!';
+       $input_hour = 1;
+       $input_minute = 38;
+       //ACT:
+       $answer = calculate_clock_angle($input_hour, $input_minute);
+       //ASSERT:
+       $expected_answer = 198;
+       $this->assertEqual($answer, $expected_answer, $results_message);
+
+
+       //ARRANGE:
+       $results_message = 'It handles hours equal to 12!';
+       $input_hour = 12;
+       $input_minute = 00;
+       //ACT:
+       $answer = calculate_clock_angle($input_hour, $input_minute);
+       //ASSERT:
+       $expected_answer = 0;
+       $this->assertEqual($answer, $expected_answer, $results_message);
+
+     }
+  }

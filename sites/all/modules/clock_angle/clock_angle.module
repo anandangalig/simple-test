@@ -1,0 +1,81 @@
+<?php
+
+  function clock_angle_menu() {
+      $items['clock_angle'] = array(
+          'title' => 'Clock Angle Calculator',
+          'page callback' => 'drupal_get_form',
+          'page arguments' => array('clock_angle_form'),
+          'access callback' => TRUE,
+          'type' => MENU_NORMAL_ITEM,
+      );
+      $items['clock_angle_success'] = array(
+          'title' => 'Numbers are in!',
+          'page callback' => 'clock_angle_result_display',
+          'access callback' => TRUE,
+          'type' => MENU_CALLBACK,
+      );
+      return $items;
+  }
+
+  function clock_angle_form() {
+
+      $form['input_hour'] = array(
+          '#title' => 'Input the Hour: works for AM and PM',
+          '#type' => 'textfield',
+          '#description' => t("Short needle position"),
+          '#element_validate' => array('element_validate_integer_positive', 'element_validate_twelve'),
+          '#required' => TRUE,
+      );
+      $form['input_minute'] = array(
+          '#title' => 'Input the Minute',
+          '#type' => 'textfield',
+          '#description' => t("Long needle position"),
+          '#element_validate' => array('element_validate_integer', 'element_validate_fiftynine'),
+          '#required' => TRUE,
+      );
+
+      $form['submit'] = array(
+          '#type' => 'submit',
+          '#value' => 'Calculate Angle',
+      );
+
+      return $form;
+  }
+//=====================Element Validations: ====================================
+  function element_validate_twelve($element) {
+    $user_input_value = $element['#value'];
+    if($user_input_value > 12 || $user_input_value == 0) {
+      form_error($element, t('The AM/PM hour needs to be 1 through 12.'));
+    }
+  }
+  function element_validate_fiftynine($element) {
+    $user_input_value = $element['#value'];
+    if($user_input_value > 59 || $user_input_value < 0) {
+      form_error($element, t('The minute input needs to be less than 59.'));
+    }
+  }
+
+//====================Calculation: =============================================
+  function clock_angle_form_submit($form, &$form_state) {
+    //Assumption: all count starts at 00 for calculations
+      $input_hour = $form_state['values']['input_hour'];
+      $input_minute = $form_state['values']['input_minute'];
+      $result = calculate_clock_angle($input_hour, $input_minute);
+      $_SESSION['result'] = $result;
+      $form_state['redirect'] = 'clock_angle_success';
+  }
+
+  function calculate_clock_angle($hour, $minute) {
+    if($hour == 12) {
+      $hour = 0; //since the starting point os 0, we have to treat 12 as 0 when calculating
+    }
+    $hour_in_degrees = $hour * 30;
+    $minute_in_degrees = $minute * 6;
+    $difference = abs($hour_in_degrees - $minute_in_degrees);
+    return $difference;
+  }
+//==================Redirecting after Success: =================================
+  function clock_angle_result_display() {
+      $answer = $_SESSION['result'];
+      return '<h2>The distance between the minute and hour hands: ' . $answer . ' degrees</h2><img src="sites/all/modules/clock_angle/images/bigben.png">';
+  }
